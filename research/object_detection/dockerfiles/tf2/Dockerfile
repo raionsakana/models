@@ -41,10 +41,6 @@ WORKDIR /home/tensorflow/models/research/
 RUN cp object_detection/packages/tf2/setup.py ./
 ENV PATH="/home/tensorflow/.local/bin:${PATH}"
 
-# USER root
-# RUN apt-get install -y cmake
-# USER tensorflow
-
 RUN python -m pip install -U pip
 RUN python -m pip install .
 
