@@ -44,4 +44,7 @@ ENV PATH="/home/tensorflow/.local/bin:${PATH}"
 RUN python -m pip install -U pip
 RUN python -m pip install .
 
+RUN pip uninstall -y opencv-python \
+    && pip install opencv-python-headless 
+
 ENV TF_CPP_MIN_LOG_LEVEL 3
