@@ -1,6 +1,12 @@
-FROM tensorflow/tensorflow:2.2.0-gpu
+FROM tensorflow/tensorflow:2.7.0-gpu
 
 ARG DEBIAN_FRONTEND=noninteractive
+
+RUN rm /etc/apt/sources.list.d/cuda.list \
+    && rm /etc/apt/sources.list.d/nvidia-ml.list \
+    && apt-key del 7fa2af80 \
+    && apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/3bf863cc.pub \
+    && apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1804/x86_64/7fa2af80.pub
 
 # Install apt dependencies
 RUN apt-get update && apt-get install -y \
@@ -14,11 +20,11 @@ RUN apt-get update && apt-get install -y \
     wget
 
 # Install gcloud and gsutil commands
-# https://cloud.google.com/sdk/docs/quickstart-debian-ubuntu
-RUN export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
-    echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
-    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
-    apt-get update -y && apt-get install google-cloud-sdk -y
+# # https://cloud.google.com/sdk/docs/quickstart-debian-ubuntu
+# RUN export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
+#     echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
+#     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
+#     apt-get update -y && apt-get install google-cloud-sdk -y
 
 # Add new user to avoid running as root
 RUN useradd -ms /bin/bash tensorflow
@@ -37,5 +43,8 @@ ENV PATH="/home/tensorflow/.local/bin:${PATH}"
 
 RUN python -m pip install -U pip
 RUN python -m pip install .
+
+RUN pip uninstall -y opencv-python \
+    && pip install opencv-python-headless 
 
 ENV TF_CPP_MIN_LOG_LEVEL 3
